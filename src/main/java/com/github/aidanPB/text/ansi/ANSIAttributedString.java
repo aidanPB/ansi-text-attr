@@ -123,6 +123,10 @@ public class ANSIAttributedString extends AttributedString {
 
 	private static final Pattern ansipat = Pattern.compile("\\e\\[(?:(\\d{1,3})((?:;\\d{1,3})*))?([^a-zA-Z]+?)?m");
 
+	public ANSIAttributedString(AttributedCharacterIterator text){
+		super(text);
+	}
+
 	private ANSIAttributedString(String str){
 		super(str);
 	}
