@@ -1,6 +1,6 @@
 package com.github.aidanPB.text.ansi;
 
-public enum TextAttributeModifier {
+public enum TextModifier {
 
 	RESET(0), BOLD(1), FAINT(2), ITALIC(3), UNDERLINE(4), BLINK_SLOW(5), BLINK_FAST(6),
 	REVERSE(7), STRIKEOUT(9), FRAKTUR(20), UNBOLD(22), UNFRATALIC(23), DEUNDERLINE(24),
@@ -14,11 +14,20 @@ public enum TextAttributeModifier {
 
 	private int codeNumber;
 
-	private TextAttributeModifier(int codeNumber){
+	private TextModifier(int codeNumber){
 		this.codeNumber = codeNumber;
 	}
 
 	public int getCodeNumber(){
 		return codeNumber;
+	}
+
+	public String toANSIEscape(int... escargs){
+		StringBuilder sb = new StringBuilder();
+		sb.append("\033[").append(codeNumber);
+		for(int arg : escargs){
+			sb.append(';').append(arg);
+		}
+		return sb.append('m').toString();
 	}
 }
