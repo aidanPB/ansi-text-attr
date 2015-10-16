@@ -20,6 +20,8 @@ public class SGRTest {
 				TextAttributeModifier.SET_FG_BLACK.getCodeNumber(),  TextAttributeModifier.SET_FG_BLACK.toString());
 		System.out.printf("This is a test of the %1$s%2$dm%3$s%1$s32m%1$s41m SGR code.%n", CSI,
 				TextAttributeModifier.SET_FG_DEFAULT.getCodeNumber(),  TextAttributeModifier.SET_FG_DEFAULT.toString());
+		System.out.printf("This is a test of the %1$s%2$dm%3$s%1$s32m%1$s41m SGR code.%n", CSI,
+				TextAttributeModifier.SET_BG_BLACK.getCodeNumber(),  TextAttributeModifier.SET_BG_BLACK.toString());
 		System.out.printf("This is a test of the %1$s%2$dm%3$s%1$s32m%1$s41m SGR code.%1$s0m%n", CSI,
 				TextAttributeModifier.SET_BG_DEFAULT.getCodeNumber(),  TextAttributeModifier.SET_BG_DEFAULT.toString());
 		System.out.println();
