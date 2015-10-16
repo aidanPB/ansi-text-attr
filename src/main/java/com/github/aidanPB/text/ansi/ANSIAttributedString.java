@@ -1,9 +1,12 @@
 package com.github.aidanPB.text.ansi;
 
 import java.text.AttributedString;
+import java.text.CharacterIterator;
 import java.awt.Color;
 import java.text.AttributedCharacterIterator;
+import java.text.AttributedCharacterIterator.Attribute;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,13 +15,25 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 public class ANSIAttributedString extends AttributedString {
 
 	public static class ANSIAttribute extends AttributedCharacterIterator.Attribute{
+
 		/**
 		 * The unique ID number for this version of this class.
 		 */
-		private static final long serialVersionUID = 8360871967590967690L;
+		private static final long serialVersionUID = 514136063403470694L;
 
-		protected ANSIAttribute(String name){
+		public enum AttributeKind{
+			STRENGTH,BLINK,FONT,LETTER,UNDERLN,OVERLN,FOREGROUND,BACKGROUND,STRIKE,REVERSE,SURROUND
+		}
+
+		private final AttributeKind kind;
+
+		protected ANSIAttribute(String name, AttributeKind kind){
 			super(name);
+			this.kind = kind;
+		}
+
+		public AttributeKind getKind(){
+			return kind;
 		}
 	}
 
@@ -26,7 +41,7 @@ public class ANSIAttributedString extends AttributedString {
 	 * Attribute key for the "strength" of a text. Values should be constants of
 	 * the ANSIAttributedString.ANSIWeight enum type. The default value is NORMAL.
 	 */
-	public static final ANSIAttribute ANSI_STRENGTH = new ANSIAttribute("ANSI_STRENGTH");
+	public static final ANSIAttribute ANSI_STRENGTH = new ANSIAttribute("ANSI_STRENGTH", ANSIAttribute.AttributeKind.STRENGTH);
 	public enum ANSIWeight{
 		BOLD,NORMAL,FAINT
 	}
@@ -35,7 +50,7 @@ public class ANSIAttributedString extends AttributedString {
 	 * Attribute key for the blink rate of a text. Values should be constants of
 	 * the ANSIAttributedString.ANSIBlinkRate enum type. The default value is STEADY.
 	 */
-	public static final ANSIAttribute ANSI_BLINK = new ANSIAttribute("ANSI_BLINK_RATE");
+	public static final ANSIAttribute ANSI_BLINK = new ANSIAttribute("ANSI_BLINK_RATE", ANSIAttribute.AttributeKind.BLINK);
 	public enum ANSIBlinkRate{
 		STEADY,SLOW,FAST
 	}
@@ -45,14 +60,14 @@ public class ANSIAttributedString extends AttributedString {
 	 * fonts, and this attribute selects which one by number. Values should be
 	 * instances of Byte, valued in the range 0-9, inclusive. Default value is 0.
 	 */
-	public static final ANSIAttribute ANSI_FONT = new ANSIAttribute("ANSI_FONT_NUMBER");
+	public static final ANSIAttribute ANSI_FONT = new ANSIAttribute("ANSI_FONT_NUMBER", ANSIAttribute.AttributeKind.FONT);
 
 	/**
 	 * Attribute key for the letterform of a text. Some terminals can handle italic
 	 * and/or (more rarely) Fraktur letterforms. Values should be constants of the
 	 * ANSIAttributedString.ANSILetterform enum type. The default value is NORMAL.
 	 */
-	public static final ANSIAttribute ANSI_LETTER = new ANSIAttribute("ANSI_LETTERFORM");
+	public static final ANSIAttribute ANSI_LETTER = new ANSIAttribute("ANSI_LETTERFORM", ANSIAttribute.AttributeKind.LETTER);
 	public enum ANSILetterform{
 		NORMAL,ITALIC,FRAKTUR
 	}
@@ -61,47 +76,47 @@ public class ANSIAttributedString extends AttributedString {
 	 * Attribute key for the underline status of a text. Values should be instances
 	 * of Boolean. The default value is False.
 	 */
-	public static final ANSIAttribute ANSI_ULINE = new ANSIAttribute("ANSI_UNDERLINE");
+	public static final ANSIAttribute ANSI_ULINE = new ANSIAttribute("ANSI_UNDERLINE", ANSIAttribute.AttributeKind.UNDERLN);
 
 	/**
 	 * Attribute key for the overline status of a text. Values should be instances
 	 * of Boolean. The default value is False.
 	 */
-	public static final ANSIAttribute ANSI_OVERLN = new ANSIAttribute("ANSI_OVERLINE");
+	public static final ANSIAttribute ANSI_OVERLN = new ANSIAttribute("ANSI_OVERLINE", ANSIAttribute.AttributeKind.OVERLN);
 
 	/**
 	 * Attribute key for the foreground (text) colour of a text. Values should be
 	 * instances of java.awt.Color. the default value is null, which represents the
 	 * terminal-dependent default value.
 	 */
-	public static final ANSIAttribute ANSI_FG_COL = new ANSIAttribute("FOREGROUND_COLOR");
+	public static final ANSIAttribute ANSI_FG_COL = new ANSIAttribute("FOREGROUND_COLOR", ANSIAttribute.AttributeKind.FOREGROUND);
 
 	/**
 	 * Attribute key for the background colour of a text. Values should be instances
 	 * of java.awt.Color. The default value is null, which represents the
 	 * terminal-dependent default value.
 	 */
-	public static final ANSIAttribute ANSI_BG_COL = new ANSIAttribute("BACKGROUND_COLOR");
+	public static final ANSIAttribute ANSI_BG_COL = new ANSIAttribute("BACKGROUND_COLOR", ANSIAttribute.AttributeKind.BACKGROUND);
 
 	/**
 	 * Attribute key for the strike-out status of a text. Values should be instances
 	 * of Boolean. The default value is False.
 	 */
-	public static final ANSIAttribute ANSI_STRIKE = new ANSIAttribute("STRIKE_OUT");
+	public static final ANSIAttribute ANSI_STRIKE = new ANSIAttribute("STRIKE_OUT", ANSIAttribute.AttributeKind.STRIKE);
 
 	/**
 	 * Attribute key for the reverse video status of a text. Values should be
 	 * instances of Boolean; when true, foregroud and background colours are swapped.
 	 * Default value is false.
 	 */
-	public static final ANSIAttribute ANSI_REVERSE = new ANSIAttribute("REVERSE_VIDEO");
+	public static final ANSIAttribute ANSI_REVERSE = new ANSIAttribute("REVERSE_VIDEO", ANSIAttribute.AttributeKind.REVERSE);
 
 	/**
 	 * Attribute key for the surroundedness of a text. Some terminals can surround
 	 * text with rectangular or round shapes. Values should be constants of the
 	 * ANSIAttributedString.ANSISurround enum type. The default value is NONE.
 	 */
-	public static final ANSIAttribute ANSI_SURROUND = new ANSIAttribute("ANSI_SURROUND");
+	public static final ANSIAttribute ANSI_SURROUND = new ANSIAttribute("ANSI_SURROUND", ANSIAttribute.AttributeKind.SURROUND);
 	public enum ANSISurround{
 		NONE,FRAMED,ENCIRCLED
 	}
@@ -593,5 +608,248 @@ public class ANSIAttributedString extends AttributedString {
 			ansistr.addAttribute(triple.getMiddle(), triple.getRight(), triple.getLeft(), attribend);
 		}
 		return ansistr;
+	}
+
+	public String toString(){
+		AttributedCharacterIterator citer = getIterator();
+		StringBuffer sbuf = new StringBuffer(citer.getEndIndex());
+		char currch = citer.first();
+		while(currch != CharacterIterator.DONE){
+			for(Entry<Attribute, Object> entry : citer.getAttributes().entrySet()){
+				if(!(entry.getKey() instanceof ANSIAttribute))continue;
+				if(citer.getRunStart(entry.getKey()) == citer.getIndex()){
+					ANSIAttribute key = (ANSIAttribute) entry.getKey();
+					Object attrval = entry.getValue();
+					int code;
+					Color colval;
+					switch(key.getKind()){
+					case BACKGROUND:
+						if(attrval != null && !(attrval instanceof Color)) attrval = null;
+						if(attrval == null){
+							sbuf.append("\033[49m");
+							break;
+						}
+						colval = (Color) attrval;
+						if(colval.equals(Color.BLACK)){
+							sbuf.append("\033[40m");
+							break;
+						}
+						if(colval.equals(Color.GRAY)){
+							sbuf.append("\033[47m");
+							break;
+						}
+						if(colval.equals(Color.RED.darker().darker())){
+							sbuf.append("\033[41m");
+							break;
+						}
+						if(colval.equals(Color.GREEN.darker().darker())){
+							sbuf.append("\033[42m");
+							break;
+						}
+						if(colval.equals(Color.YELLOW.darker().darker())){
+							sbuf.append("\033[43m");
+							break;
+						}
+						if(colval.equals(Color.BLUE.darker().darker())){
+							sbuf.append("\033[44m");
+							break;
+						}
+						if(colval.equals(Color.MAGENTA.darker().darker())){
+							sbuf.append("\033[45m");
+							break;
+						}
+						if(colval.equals(Color.CYAN.darker().darker())){
+							sbuf.append("\033[46m");
+							break;
+						}
+						if(colval.equals(Color.RED)){
+							sbuf.append("\033[101m");
+							break;
+						}
+						if(colval.equals(Color.GREEN)){
+							sbuf.append("\033[102m");
+							break;
+						}
+						if(colval.equals(Color.YELLOW)){
+							sbuf.append("\033[103m");
+							break;
+						}
+						if(colval.equals(Color.BLUE)){
+							sbuf.append("\033[104m");
+							break;
+						}
+						if(colval.equals(Color.MAGENTA)){
+							sbuf.append("\033[105m");
+							break;
+						}
+						if(colval.equals(Color.CYAN)){
+							sbuf.append("\033[106m");
+							break;
+						}
+						if(colval.equals(Color.WHITE)){
+							sbuf.append("\033[107m");
+							break;
+						}
+						sbuf.append("\033[").append(48).append(';').append(2).append(';').append(colval.getRed())
+								.append(';').append(colval.getGreen()).append(";").append(colval.getBlue()).append("m");
+						break;
+					case BLINK:
+						if(!(attrval instanceof ANSIBlinkRate)) attrval = ANSIBlinkRate.STEADY;
+						switch((ANSIBlinkRate) attrval){
+						case FAST:
+							code = 6;
+							break;
+						case SLOW:
+							code = 5;
+							break;
+						default:
+							code = 25;
+							break;
+						}
+						sbuf.append("\033[").append(code).append("m");
+						break;
+					case FONT:
+						if(!(attrval instanceof Byte)) attrval = (byte) 0;
+						code = 10 + (Byte) attrval;
+						sbuf.append("\033[").append(code).append("m");
+						break;
+					case FOREGROUND:
+						if(attrval != null && !(attrval instanceof Color)) attrval = null;
+						if(attrval == null){
+							sbuf.append("\033[49m");
+							break;
+						}
+						colval = (Color) attrval;
+						if(colval.equals(Color.BLACK)){
+							sbuf.append("\033[30m");
+							break;
+						}
+						if(colval.equals(Color.LIGHT_GRAY)){
+							sbuf.append("\033[37m");
+							break;
+						}
+						if(colval.equals(Color.RED.darker())){
+							sbuf.append("\033[31m");
+							break;
+						}
+						if(colval.equals(Color.GREEN.darker())){
+							sbuf.append("\033[32m");
+							break;
+						}
+						if(colval.equals(Color.YELLOW.darker())){
+							sbuf.append("\033[33m");
+							break;
+						}
+						if(colval.equals(Color.BLUE.darker())){
+							sbuf.append("\033[34m");
+							break;
+						}
+						if(colval.equals(Color.MAGENTA.darker())){
+							sbuf.append("\033[35m");
+							break;
+						}
+						if(colval.equals(Color.CYAN.darker())){
+							sbuf.append("\033[36m");
+							break;
+						}
+						if(colval.equals(Color.RED)){
+							sbuf.append("\033[91m");
+							break;
+						}
+						if(colval.equals(Color.GREEN)){
+							sbuf.append("\033[92m");
+							break;
+						}
+						if(colval.equals(Color.YELLOW)){
+							sbuf.append("\033[93m");
+							break;
+						}
+						if(colval.equals(Color.BLUE)){
+							sbuf.append("\033[94m");
+							break;
+						}
+						if(colval.equals(Color.MAGENTA)){
+							sbuf.append("\033[95m");
+							break;
+						}
+						if(colval.equals(Color.CYAN)){
+							sbuf.append("\033[96m");
+							break;
+						}
+						if(colval.equals(Color.WHITE)){
+							sbuf.append("\033[97m");
+							break;
+						}
+						sbuf.append("\033[").append(38).append(';').append(2).append(';').append(colval.getRed())
+								.append(';').append(colval.getGreen()).append(";").append(colval.getBlue()).append("m");
+						break;
+					case LETTER:
+						if(!(attrval instanceof ANSILetterform)) attrval = ANSILetterform.NORMAL;
+						switch((ANSILetterform) attrval){
+						case ITALIC:
+							code = 3;
+							break;
+						case FRAKTUR:
+							code = 20;
+							break;
+						default:
+							code = 23;
+							break;
+						}
+						sbuf.append("\033[").append(code).append("m");
+						break;
+					case OVERLN:
+						if(!(attrval instanceof Boolean)) attrval = false;
+						sbuf.append((Boolean) attrval?"\033[53m":"\033[55m");
+						break;
+					case REVERSE:
+						if(!(attrval instanceof Boolean)) attrval = false;
+						sbuf.append((Boolean) attrval?"\033[7m":"\033[27m");
+						break;
+					case STRENGTH:
+						if(!(attrval instanceof ANSIWeight)) attrval = ANSIWeight.NORMAL;
+						switch((ANSIWeight) attrval){
+						case BOLD:
+							code = 1;
+							break;
+						case FAINT:
+							code = 2;
+							break;
+						default:
+							code = 22;
+							break;
+						}
+						sbuf.append("\033[").append(code).append("m");
+						break;
+					case STRIKE:
+						if(!(attrval instanceof Boolean)) attrval = false;
+						sbuf.append((Boolean) attrval?"\033[9m":"\033[29");
+						break;
+					case SURROUND:
+						if(!(attrval instanceof ANSISurround)) attrval = ANSISurround.NONE;
+						switch((ANSISurround) attrval){
+						case ENCIRCLED:
+							code = 52;
+							break;
+						case FRAMED:
+							code = 51;
+							break;
+						default:
+							code = 54;
+							break;
+						}
+						sbuf.append("\033[").append(code).append("m");
+						break;
+					case UNDERLN:
+						if(!(attrval instanceof Boolean)) attrval = false;
+						sbuf.append((Boolean) attrval?"\033[4m":"\033[24m");
+						break;
+					}
+				}
+			}
+			sbuf.append(currch);
+			currch = citer.next();
+		}
+		return sbuf.toString();
 	}
 }
