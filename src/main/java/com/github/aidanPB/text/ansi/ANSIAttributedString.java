@@ -127,6 +127,10 @@ public class ANSIAttributedString extends AttributedString {
 		super(text);
 	}
 
+	public ANSIAttributedString(AttributedCharacterIterator text, int beginIdx, int endIdx){
+		super(text, beginIdx, endIdx);
+	}
+
 	private ANSIAttributedString(String str){
 		super(str);
 	}
@@ -600,7 +604,7 @@ public class ANSIAttributedString extends AttributedString {
 			ImmutableTriple<Integer, ANSIAttribute, ?> triple = ansicodes.get(i);
 			if(triple.getLeft() == sbuf.length()) break;
 			int attribend = triple.getLeft() - 1;
-			for(int j = i;j < ansicodes.size();++j){
+			for(int j = i + 1;j < ansicodes.size();++j){
 				ImmutableTriple<Integer, ANSIAttribute, ?> nexttrip = ansicodes.get(j);
 				if(nexttrip.getMiddle().equals(triple.getMiddle())){
 					attribend = nexttrip.getLeft();
