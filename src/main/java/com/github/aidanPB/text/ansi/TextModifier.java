@@ -2,7 +2,43 @@ package com.github.aidanPB.text.ansi;
 
 public enum TextModifier {
 
-	RESET(0), BOLD(1), FAINT(2), ITALIC(3), UNDERLINE(4), BLINK_SLOW(5), BLINK_FAST(6),
+	/**
+	 * Resets and removes the effects of all other SGR codes. This causes the terminal
+	 * to display the text that follows it with default display attributes.
+	 */
+	RESET(0),
+	/**
+	 * Instructs the terminal to display the text that follows it as bolded or strong
+	 * text.
+	 */
+	BOLD(1),
+	/**
+	 * Instructs the terminal to display the text that follows it as fainter or in a
+	 * thinner font than normal.
+	 */
+	FAINT(2),
+	/**
+	 * Instructs the terminal to display the text that follows it as italicized.
+	 */
+	ITALIC(3),
+	/**
+	 * Instructs the terminal to display the text that follows it as underlined.
+	 */
+	UNDERLINE(4),
+	/**
+	 * Instructs the terminal to slowly blink the text that follows it. This is not widely
+	 * supported. (Unsupported SGR codes should be ignored and not displayed.)
+	 */
+	BLINK_SLOW(5),
+	/**
+	 * Instructs the terminal to rapidly blink the text that follows it. This is supported
+	 * even more rarely than BLINK_SLOW.
+	 */
+	BLINK_FAST(6),
+	/**
+	 * Instructs the terminal to display the text that follows it in reverse video (using
+	 * the set background colour for the foreground and vice-versa).
+	 */
 	REVERSE(7), STRIKEOUT(9), FRAKTUR(20), UNBOLD(22), UNFRATALIC(23), DEUNDERLINE(24),
 	UNBLINKING(25), UNINVERSE(27), UNCROSSED(29), SET_FG_BLACK(30), SET_FG_RED(31),
 	SET_FG_GREEN(32), SET_FG_YELLOW(33), SET_FG_BLUE(34), SET_FG_MAGENTA(35),
